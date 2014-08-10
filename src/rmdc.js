@@ -26,7 +26,6 @@ var download = function(url, dest, cb) {
 ResourceModel = function(){
 	this.modules = [];
 	this.state = this.states.START;
-	this.
 }
 
 ResourceModel.prototype.states={
@@ -66,7 +65,7 @@ ResourceModel.prototype.currType = function(){
 }
 
 ResourceModel.prototype.analyzeModel = function(){
-	this.files = { '#' : { localName : '', uri :  }
+
 }
 
 // Read the file and print its contents.

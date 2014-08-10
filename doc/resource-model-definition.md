@@ -7,7 +7,7 @@ Resource Model Definition Languages (RMDL) provides a specification language for
 * Enable a tool chain for the creation of bindings of that specification into various serialization formats (JSON, XML) and languages (both schema languages as well as programming languages)
 * Provide means to version RMDL models and verify their structural compatibility 
 
-Check the [Future extensions][#future_extensions] section for others features that may come. 
+Check the [Future extensions](#future_extensions) section for others features that may come. 
 
 Other than most schema languages RMDL focuses on the documentation of a model, and therefore uses a text processing centric approach rather than a programming language / formal specification approach. To achieve that goal, RDML adopts the idea of [RAML](http://raml.org/) or [apiblueprint](http://apiblueprint.org/) to data modeling: Built upon [Markdown](http://daringfireball.net/projects/markdown/) RDML adds some conventions on top of the basic Markdown syntax. By using Markdown RDML allows data modelers to use any text editor to write RMDL specifications.
 
