@@ -7,7 +7,7 @@ Resource Model Definition Languages (RMDL) provides a specification language for
 * Enable a tool chain for the creation of bindings of that specification into various serialization formats (JSON, XML) and languages (both schema languages as well as programming languages)
 * Provide means to version RMDL models and verify their structural compatibility 
 
-Check the [Future extensions]() section for others features that may come. 
+Check the [Future extensions][#future_extensions] section for others features that may come. 
 
 Other than most schema languages RMDL focuses on the documentation of a model, and therefore uses a text processing centric approach rather than a programming language / formal specification approach. To achieve that goal, RDML adopts the idea of [RAML](http://raml.org/) or [apiblueprint](http://apiblueprint.org/) to data modeling: Built upon [Markdown](http://daringfireball.net/projects/markdown/) RDML adds some conventions on top of the basic Markdown syntax. By using Markdown RDML allows data modelers to use any text editor to write RMDL specifications.
 
@@ -42,7 +42,7 @@ RMDL Meta Model
 
 RMDL has six basic meta model elements to specify a data model:
 
-* package: A group of data models sharing a common domain 
+* module: A group of data models sharing a common domain 
 * dependencies: The dependency of one package to other packages or versions of packages.
 * type: An individual data model specification
 * element: A sub-component of a type
@@ -55,12 +55,12 @@ RMDL Format
 RMDL uses Markdown as underlying syntax. On top of plain Markdown RMDL comes with a predefined semantic for specific Markdown heading types that start the specification of a specific model element:
 
 * heading 1 (reserved)
-* heading 2 specifies packages
+* heading 2 specifies modules
 * heading 3 specifies types
 * heading 4 specifies type elements
 * heading 5 specifies parameters or dependencies
 
-As properties are predefined, there is no need to introduce new properties.
+As properties are predefined, there is no need to introduce new properties within a RMDL specification.
 
 For each of the headings a special syntax in defined that allows to give a structured specification of the relationships between the various elements of a model specification:
 
@@ -160,18 +160,18 @@ RMDL supports a short representation for Boolean values: If a parameter or prope
 RDML Core Types
 ----
 
-The RMDL core types are described in a [RDML Specification](../models/core.rdm).
+The RMDL core types are described in a [RDML Specification](../models/core.rmd).
 
 Compatibility
 ------
 
 WIP
 
-Future Extensions
+<a name="future_extensions"></a>Future Extensions
 -----
 
 This first version of RMDL focuses on the definition of individual resources and building a tool chain for verification, compatibility-checks and serialization format generators.
 
 Versions will extend RDML with a hypertext control model, that allows not only the structure of a data model of a resource, but also describe resource models for hypertext based API. 
 
-Three exist also early ideas to combine multiple RMDL models into one API model and then being able to provide compatibility checks for a API as a whole. 
+There exist also early ideas to combine multiple RMDL models into a single API model and then being able to provide compatibility checks for an API as a whole. 
