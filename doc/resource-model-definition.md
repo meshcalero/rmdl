@@ -16,26 +16,138 @@ RMDL models don't specify any physical format directly. A RMDL compiler is expec
 RMDL Example
 ----
 
-A simple RMDL example specifying a structured representation of a geocoordinate:
+A simple RMDL example specifies a structured representation of a geocoordinate:
 
 	Geo
 	-----
-	The package Geo contains data models for geographic objects
+	The package Geo contains data models for geo-spatial data
 
 	###GeoCoordinate
 	
 	A location on earth specified by means of latitude, longitude and elevation.
 
-	#### latitiude : Number[min:-90.0,max:90.0] (required)
-	The [latitude](http://en.wikipedia.org/wiki/Latitude) of a location on earth by means of [WGS84](http://en.wikipedia.org/wiki/World_Geodetic_System)
-	
+	#### latitude : Number[min:-90.0,max:90.0] (required)
+	The [latitude](http://en.wikipedia.org/wiki/Latitude) of a location 
+	on earth by means of [WGS84](http://en.wikipedia.org/wiki/World_Geodetic_System)
 	#### longitude : Number[min:-180.0,max:180.0] (required)
-	The [longitude](http://en.wikipedia.org/wiki/Longitude) of a location on earth by means of [WGS84](http://en.wikipedia.org/wiki/World_Geodetic_System)	
-	
+	The [longitude](http://en.wikipedia.org/wiki/Longitude) of a location on earth 
+	by means of [WGS84](http://en.wikipedia.org/wiki/World_Geodetic_System)	
 	#### altitude : Number
 	The elevation of a location on earth by means of meters above sea-level
 
 This RMDL specification describes a data structure `GeoCoordinate` within a package `Geo` that contains the three elements `latitude`, `longitude` and `altitude` as floating point values. `longitude` and `latitude` are required elements and come with restrictions in the value range, while `altitude` is as optional element (default behavior in RMDL) without any range restriction.
+
+A RMDL to json-schema generator could then generate the following JSON schema from that spec
+
+	{
+	    "$schema": "http://json-schema.org/draft-04/schema#",
+		"title": "Geo",
+		"description": "The package Geo contains data models for geo-spatial data"
+		"definitions": {
+			"GeoCoordinate": {
+			    "description": "A location on earth specified by means of latitude, longitude and elevation.",
+			    "type": "object",
+			    "properties": {
+			        "latitude": {
+			            "description": "The latitude of a location on earth by means of WGS84",
+			            "type": "number",
+						"minimum": -90.0,
+						"maximum": 90.0
+			        },
+			        "longitude": {
+			            "description": "The longitude of a location on earth by means of WGS84",
+			            "type": "number",
+						"minimum": -180.0,
+						"maximum": 180.0
+			        },
+			        "altitude": {
+						"description": "The elevation of a location on earth by means of meters above sea-level",
+			            "type": "number"
+			        },
+			    },
+			    "required": ["latitude", "longitude"]
+			}
+		}
+	} 
+
+A RMDL to XML Schema generator would instead create a XML Schema from the same model:
+
+	<?xml version="1.0"?>
+	<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+		<xs:annotation>
+		  <xs:appinfo>Geo</xs:appinfo>
+		  <xs:documentation xml:lang="en">
+		  The package Geo contains data models for geo-spatial data
+		  </xs:documentation>
+		</xs:annotation>
+		<complexType name="GeoCoordinate">
+			<xs:annotation>
+			  <xs:documentation xml:lang="en">
+			  A location on earth specified by means of latitude, longitude and elevation.
+			  </xs:documentation>
+			</xs:annotation>
+			<xs:sequence>
+				<xs:element name="latitude">
+					<xs:annotation>
+					  <xs:documentation xml:lang="en">
+					  The latitude of a location on earth by means of WGS84
+					  </xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:double">
+							<xs:minInclusive value="-90.0"/>
+							<xs:maxInclusive value="90.0"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="longitude">
+					<xs:annotation>
+					  <xs:documentation xml:lang="en">
+					  The longitude of a location on earth by means of WGS84
+					  </xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:double">
+							<xs:minInclusive value="-180.0"/>
+							<xs:maxInclusive value="180.0"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<element name="altitude" type="xs:double" minOccurs="0">
+					<xs:annotation>
+					  <xs:documentation xml:lang="en">
+					  The elevation of a location on earth by means of meters above sea-level
+					  </xs:documentation>
+					</xs:annotation>
+				</xs:element>
+ 				<xs:any minOccurs="0"/>
+			</xs:sequence>
+		</complexType>
+	</xs:schema>
+
+It is worth to mention that this XML Schema is not fully compliant to the RMDL model, as RMDL records are by default *extensible* (unless explicitly restricted by a `final` property) and *unordered*. This allows that a instance of a resource is still compatible to the RMDL model if it contains additional elements or the elements are ordered differently. XML Schema doesn't support the combination of both properties in any simple way. For sake of readability of this example we're showing a XML Schema that has given up the *unordered* property of RMDL.
+
+And a RMDL to Protocol Buffers generator would create the following serialization specification:
+
+	/* The package Geo contains data models for geo-spatial data
+	 */
+	package Geo;
+
+	/* A location on earth specified by means of latitude, longitude and elevation.
+	 */
+	messsage GeoCoordinate {
+		/* The latitude of a location on earth by means of WGS84
+		*/
+		required double latitude = 1;		
+		/* The longitude of a location on earth by means of WGS84
+		*/
+		required double longitude = 2;		
+		/* The elevation of a location on earth by means of meters above sea-level
+		*/
+		optional double altitude = 3;
+	}
+
+The Protocol Buffer example illustrates, that RMDL can't guarantee that all schema languages for serialization formats support all features of the RMDL specification. Here we are missing for example the range constraints for the various elements. Closing those gaps would in that case then be the responsibility of the (ideally also generated) binding code for a given programming language to the protocol buffers interfaces.
 
 RMDL Meta Model
 -----
