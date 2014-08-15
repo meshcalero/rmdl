@@ -77,7 +77,7 @@ TypeDecl
 	: IDENTIFIER							{ $$ = { name : $1, baseType: { refType: 'type', name: 'Record' } }; }
 	| IDENTIFIER ':' TypeReference			{ $$ = { name : $1, baseType: $3 }; }
 	| IDENTIFIER ':' TypeReference Properties	{ $$ = { name : $1, baseType: $3, properties: $4 }; }
-	| IDENTIFIER Properties					{ $$ = { name : $1, baseType: { refType: 'type', name: 'Record' }, properties: $4 }; }
+	| IDENTIFIER Properties					{ $$ = { name : $1, baseType: { refType: 'type', name: 'Record' }, properties: $2 }; }
 	;
 
 ElementDecl

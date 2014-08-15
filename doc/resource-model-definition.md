@@ -160,7 +160,7 @@ RMDL supports a short representation for Boolean values: If a parameter or prope
 RDML Core Types
 ----
 
-The RMDL core types are described in a [RDML Specification](../models/core.rmd).
+The RMDL core types are described in a [RDML Specification](../models/core.rmd.md).
 
 Compatibility
 ------
