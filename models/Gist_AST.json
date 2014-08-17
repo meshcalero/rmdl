@@ -1,0 +1,106 @@
+
+
+	{
+		"generator" : "rmdc.js",
+		"version" : "0",
+		"date" : "2014-05-08T03:13:12Z",
+		"name" : "GIST API",
+		"modules" : {
+			"#Gists":{
+				"0" : {
+					"name": "Gists",
+					"document": "file:./Gist.rmd.md",
+					"dependencies": {
+						"Gist" : ["#Gist","0"]
+					},
+					"types":{
+						"GistsModel":{
+							"name": "GistsModel",
+							"parent": ["core",0,"Record"],
+							"base": "Record",
+							"extensions": [{
+								"name": "self",
+								"type": ["hyper","0","Link"]
+							},{
+								"name": "search",
+								"type": ["#Gists","0","Link[accepts:GistSearch]"]
+							},{
+							
+							},{
+								"name": "items",
+								"type": ["#Gists","0","GistLinkCollection"]
+							}]
+						},
+						"GistLinkCollection":{
+							"name": "GistLinkCollection",
+							"parent": ["#Gists","0","PaginateableCollection[type:GistLink]"],
+							"base": "Record"
+						},
+						"GistSearch":{
+							"name": "GistSearch",
+							"parent": ["core",0,"Record"],
+							"base": "Record",
+							"extensions": [{
+								"name": "searchBy",
+								"type": ["core","0","String"]
+							},{
+								"name": "GistSearch",
+								"type": ["core","0","String"]
+							}]
+						},
+						"Link[accept:GistSearch]":{
+							"parent" : ["hyper","0","Link"],
+							"parentParams" : {
+								"accept": { "typeRef" : ["#Gists","0","GistSearch"] }
+							}
+						},
+						"PaginateableCollection[type:GistLink]": {
+							"parent": ["hyper","0","PaginateableCollection"],
+							"parentParams" : {
+								"accept": { "typeRef" : ["#Gists","0","GistLink"] }
+							}
+						}
+					},
+					"resourceType" : ["#Gists",0,"GistsModel"]
+				}
+			},
+			"#Gist":{
+				"0" : {
+					"name": "Gist",
+					"document": "file:./Gist.rmd.md",
+					"types":{
+						"GistModel":{
+							"name": "GistModel",
+							"parent": ["core",0,"Record"],
+							"base": "Record",
+							"extensions": [{
+								"name": "self",
+								"type": ["hyper","0","Link"]
+							},{
+								"name": "edit",
+								"type": ["anonymous","0","Link[method:PUT]"]
+							},{
+							
+							},{
+								"name": "id",
+								"type": ["core","0","Integer"],
+								"properties": {
+									"readOnly" : { "value" : true }
+								}
+							},{
+							
+							}]
+						},
+						"GistStatus":{
+							"name": "GistStatus",
+							"parent": ["core",0,"Enum"],
+							"base": "Enum",
+							"extensions": [	"active", "archived" ]
+						}
+					},
+					"resourceType" : ["#Gists",0,"GistModel"]
+				}
+			}
+		},
+		"index": ["#Gists",0,"GistsModel"]
+	}
