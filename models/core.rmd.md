@@ -158,11 +158,12 @@ The minimal amount of elements in the set
 ##### maxSize: Integer[min:1]
 The maximal amount of elements in the set
 
-###DefaultValue: Choice (usage:internal)
-All types that are supported for default values
-
+###ScalarValue: Choice (usage:internal)
 #### : Boolean
 #### : Integer
 #### : Number
 #### : String
+
+###DefaultValue: ScalarValue (usage:internal)
+All types that are supported for default values
 #### : Type

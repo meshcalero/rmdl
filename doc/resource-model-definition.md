@@ -166,7 +166,7 @@ RMDL Format
 
 RMDL uses Markdown as underlying syntax. On top of plain Markdown RMDL comes with a predefined semantic for specific Markdown heading types that start the specification of a specific model element:
 
-* heading 1 (reserved)
+* heading 1 specifies an API
 * heading 2 specifies modules
 * heading 3 specifies types
 * heading 4 specifies type elements
@@ -176,21 +176,33 @@ As properties are predefined, there is no need to introduce new properties withi
 
 For each of the headings a special syntax in defined that allows to give a structured specification of the relationships between the various elements of a model specification:
 
-### Packages
 
-A package specification starts with a heading 1 line that uses the following format:
+### API
 
-	packageName : primaryType[typeParam:value,...] (property:value,...)
+An API specification starts with a heading 1 line that uses the following format:
+
+	moduleName : primaryType[typeParam:value,...] (property:value,...)
 
 The line may contain the following elements:
 
-* The first token is an identifier for the new type
-* If the package specifies a `primaryType`, the package specifies a resource model and `primaryType ` (and the corresponding type parameters) specifies the Type that is uses for the resource's representation.
+* The first token is an identifier for the module
+* If the package specifies a `primaryType`, the module specifies a resource model and `primaryType ` (and the corresponding type parameters) specifies the Type that is uses for the resource's representation.
+
+### Modules
+
+A module specification starts with a heading 2 line that uses the following format:
+
+	moduleName : primaryType[typeParam:value,...] (property:value,...)
+
+The line may contain the following elements:
+
+* The first token is an identifier for the module
+* If the package specifies a `primaryType`, the module specifies a resource model and `primaryType ` (and the corresponding type parameters) specifies the Type that is uses for the resource's representation.
 
 
 ### Types 
 
-A type specification starts with a heading 2 line that uses the following format:
+A type specification starts with a heading 3 line that uses the following format:
 
 	typeName[typeParam,...] : parentType[typeParam:value,...] (property:value,...)
 
@@ -204,7 +216,7 @@ The line may contain the following elements:
 
 ### Elements
 
-The specification of each individual element is listed below the type specification it belongs to and starts with a heading 3 line that uses the following format:
+The specification of each individual element is listed below the type specification it belongs to and starts with a heading 4 line that uses the following format:
 
 	element : type[typeParam:value,...] (property:value,...)
 
@@ -217,7 +229,7 @@ The line may contain the following elements:
 
 ### Type Parameters
 
-Type parameters specifications use the same format as elements; the only difference is that type parameters use heading 4 instead of heading 3. 
+Type parameters specifications use the same format as elements; the only difference is that type parameters use heading 5 instead of heading 4. 
 
 Type parameters of a type are specified directly after the type definition and before the first element of the type.
 
@@ -225,13 +237,20 @@ Type parameters of a type are specified directly after the type definition and b
 
 The specification of the dependencies of a package is listed below the package specification it belongs to. It starts with a heading 4 line that use the following syntax
 
-	"packageURI" (property:value,...)
+	[moduleName](moduleUri) (property:value,...)
 
 Each dependency line contains the following elements:
 
-* A URI pointing to a package in some RMDL resource. The name of the package must follow the document's URI as URI fragment. Local package references just use `#packageName`
+* A URI pointing to a module in some RMDL specification document. The name of the module must follow the document's URI as URI fragment. Local module references just use `#moduleName`, which is also the default value, in case the moduleUri string is empty.
+* If a module has dependencies to two RMDL documents containing the same name, an alias name allows to give the two modules two distinct names. 
 * The most important property is the version of the package this package refers to.
 
+Some examples:
+
+* `[Example](#Example)` - refers to the module `Example` in the same RMDL document
+* `[Example]()` - short notation for the above
+* `[Example](http://example.com/rmdf#Example)` - refers to the module `Example` in the external document with URI `http://example.com/rmdf`
+* `[Alias](http://example.com/rmdf#Example)` - refers to the module `Example` in the external document with URI `http://example.com/rmdf`
 ### Properties
 
 Available properties are predefined, either globally by RMDL directly or by certain tool chains that operate on RMDL specifications. In order to avoid naming conflicts between various tool chains, property identifiers are namespaced and use a dot-notation `namespace.property`. 
@@ -240,26 +259,42 @@ Property values can only be scalar types (strings, number, boolean).
 
 Property identifiers without namespace prefix refer to RMDL properties:
 
-#### default: DefaultValue
-Specifies for elements and type parameters the default value that is used in case the parameter or property is not explicitly set. 
+* `default: DefaultValue`
 
-#### required: Boolean (default:false)
-Specifies if an element is a required element
+	Specifies for elements and type parameters the default value that is used in case the parameter or property is not explicitly set. 
 
-#### usage: Usage (default:out)
-Specifies the intended usage of a given type. Based on that property the corresponding compatibility for a given type get 
+* `required: Boolean (default:false)`
 
-#### final: Boolean (default:false)
-Specifies if subsequent versions of a given type definition will never add additional elements to the type
+	Specifies if an element is a required element
 
-#### named: Boolean (default:false)
-Specifies if compatibility checks shall not only check if for structural compatibility, but also for the usage of the same type
+* `usage: Usage (default:out)`
 
-#### version: Integer (default:0)
-Specifies the major version number for a resource model (used for both, package declaration and dependencies specification)
+	Specifies the intended usage of a given type. Based on that property the corresponding compatibility for a given type get
 
-#### localName: String
-Used on dependencies. Allows the definition of a unique local name for a dependent package, if a package has dependencies to multiple packages in distinct RMDL files that have the same name. This local name is then used as prefix when referring to types of the given package. 
+* `readOnly: Boolean (default: false)`
+
+	Specifies for types with `usage:inOut` that a specific element definition is only valid for response representations. 
+
+	A given element can not contain have both properties readOnly and writeOnly set to true. But a type may contain two equally named element
+
+* `writeOnly: Boolean (default: false)`
+
+	Specifies for types with `usage:inOut` that a specific element definition is only valid for request representations.
+
+	A given element can not contain have both properties readOnly and writeOnly set to true. But a type may contain two equally named element
+
+* `final: Boolean (default:false)`
+
+	Specifies if subsequent versions of a given type definition will never add additional elements to the type
+
+* `named: Boolean (default:false)`
+
+	Specifies if compatibility checks shall not only check if for structural compatibility, but also for the usage of the same type
+
+* `version: Integer (default:0)`
+
+	Specifies the major version number for a resource model (used for both, package declaration and dependencies specification)
+
 
 ### Values
 
@@ -269,21 +304,23 @@ Instead of a value, you can also specify the name of a type parameter, if that p
 
 RMDL supports a short representation for Boolean values: If a parameter or property requires a boolean value, just specifying the name of the parameter/property `x` is equivalent to writing `x:true`
 
-RDML Core Types
+RMDL Core Types
 ----
 
 The RMDL core types are described in a [RDML Specification](../models/core.rmd.md).
 
-Compatibility
+Versioning & Compatibility
 ------
 
-WIP
+Resource Models change as as API evolves. The RMDL specification defines extensibility rules for each RMDL Core Type and the intended usage. Based on those rules it is possible to build an automated compatibility check that allows to process two versions of RMDL specification document and check them for compatibility along the
+A RMDL model assigns a version number to each module. If a module has no explicit version assigned, this indicates that the module
 
 <a name="future_extensions"></a>Future Extensions
 -----
 
 This first version of RMDL focuses on the definition of individual resources and building a tool chain for verification, compatibility-checks and serialization format generators.
 
-Versions will extend RDML with a hypertext control model, that allows not only the structure of a data model of a resource, but also describe resource models for hypertext based API. 
+Versions will extend RMDL with a hypertext control model, that allows not only the structure of a data model of a resource, but also describe resource models for hypertext based API. 
 
-There exist also early ideas to combine multiple RMDL models into a single API model and then being able to provide compatibility checks for an API as a whole. 
+There exist also early ideas to combine multiple RMDL models into a single API model and then being able to provide compatibility checks for an API as a whole.
+

@@ -4,7 +4,6 @@ if (process.argv.length < 3) {
   process.exit(1);
 }
 
-
 var Parser = (exports.Parser !== undefined ? exports.Parser : require('../lib/rmdp.js').Parser);
 var	parser = new Parser();
 var http = require('http');
@@ -122,8 +121,22 @@ rmdlRenderer.heading = function(text,level,raw){
 	return marked.Renderer.prototype.heading.call(this,text,level,raw);
 }
 
+rmdlRenderer.listitem = function(text){
+	//console.log("new list-item:\n");
+	//console.log(text);
+}
+
+var tokWrapper = function() {
+  //console.log("got token type: "+this.token.type);
+  return marked.Parser.prototype.tok.call(this);
+}
+
 function processRmdl(rmdlString){
-	marked(rmdlString, { renderer: rmdlRenderer });
+	var options = { renderer: rmdlRenderer };
+	var tokens = marked.lexer(rmdlString, options);
+	var parser = new marked.Parser(options);
+	parser.tok = tokWrapper;
+	var html = parser.parse(tokens)
 	console.log(rm);
 }
 
