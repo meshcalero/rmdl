@@ -4,7 +4,8 @@ if (process.argv.length < 3) {
   process.exit(1);
 }
 
-var Parser = (exports.Parser !== undefined ? exports.Parser : require('../lib/rmdp.js').Parser);
+var assert = require('assert');
+var Parser = require('../lib/rmdp.js').Parser;
 var	parser = new Parser();
 var http = require('http');
 var fs = require('fs');
@@ -22,12 +23,21 @@ var download = function(url, dest, cb) {
   });
 };
 
-ResourceModel = function(){
-	this.modules = [];
+function orDefault(value,def){
+	return ( value == undefined ? def : value )
+}
+
+// Read the file and print its contents.
+var fs = require('fs');
+var filename = require('path').resolve(process.argv[2]);
+
+ResourceModelState = function(){
+	this.currModule = null;
+	this.currType = null;
 	this.state = this.states.START;
 }
 
-ResourceModel.prototype.states={
+ResourceModelState.prototype.states={
 	START:0,
 	MODULE:1,
 	DEPENDENCY:2,
@@ -36,7 +46,7 @@ ResourceModel.prototype.states={
 	ELEMENT:5
 };
 
-ResourceModel.prototype.validTransitions=[
+ResourceModelState.prototype.validTransitions=[
 	[false, true,  false, false, false, false],
 	[false, true,  true,  true,  false, false],
 	[false, true,  true,  true,  false, false],
@@ -45,33 +55,27 @@ ResourceModel.prototype.validTransitions=[
 	[false, true,  false, true,  false, true ]
 ];
 
-ResourceModel.prototype.nextState = function(newState){
+ResourceModelState.prototype.nextState = function(newState){
 	if(!this.validTransitions[this.state,newState]){
 		throw "Unexpected item";
 	}
 	this.state = newState;
 }
 
-ResourceModel.prototype.currModule = function(){
-	if (this.state == this.states.START) return null;
-	return this.modules[this.modules.length-1];
+ResourceModelState.prototype.startModule = function(module){
+	this.currModule = module;
+	this.currType = null;
 }
 
-ResourceModel.prototype.currType = function(){
-	var pck = this.currModule();
-	if( pck.types.length==0 ) return null;
-	return pck.types[ pck.types.length-1 ];
+ResourceModelState.prototype.startType = function(type){
+	this.currType = type;
 }
 
-ResourceModel.prototype.analyzeModel = function(){
+var state = new ResourceModelState();
+var Ast = require("../src/rmdl_ast.js").Ast;
+var ast = new Ast(filename);
 
-}
-
-// Read the file and print its contents.
-var fs = require('fs');
-var filename = require('path').resolve(process.argv[2]);
-var rm = new ResourceModel(filename);
-
+assert(ast,"Failed to instantiate AST");
 
 fs.readFile(filename, 'utf8', function(err, data) {
   if (err) throw err;
@@ -87,34 +91,33 @@ rmdlRenderer.heading = function(text,level,raw){
 	var line = text.replace(/\&quot;/g,'"');
 	switch(level){
 		case 2: 
-			rm.nextState(rm.states.MODULE);
-			var newModule = parser.parse("MODULE "+line);
-			newModule.dependencies=[];
-			newModule.types=[];
-			rm.modules.push(newModule);
+			state.nextState(state.states.MODULE);
+			state.startModule(
+				ast.addModule(
+					parser.parse("MODULE "+line)
+			)	);
 			break;
 		case 3:
-			rm.nextState(rm.states.TYPE);
-			var newType = parser.parse("TYPE "+line);
-			newType.params=[];
-			newType.elements=[];
-			rm.currModule().types.push(newType)
+			state.nextState(state.states.TYPE);
+			state.startType(
+				state.currModule.addType(
+					parser.parse("TYPE "+line)
+			)	);
 			break;
 		case 4:
-			rm.nextState(rm.states.ELEMENT);
-			var newElement = parser.parse("ELEMENT "+line);
-			rm.currType().elements.push(newElement);
+			state.nextState(state.states.ELEMENT);
+			state.currType.addElement(
+				parser.parse("ELEMENT "+line)
+			);
 			break;
 		case 5: 
-			if(rm.state == rm.states.MODULE){
-				rm.nextState(rm.states.DEPENDENCY);
-				var newDependency = parser.parse("DEPENDENCY "+line);
-				rm.currModule().dependencies.push(newDependency);
+			if(state.state == state.states.MODULE){
+				state.nextState(state.states.DEPENDENCY);
+				state.currModule.addDependency(parser.parse("DEPENDENCY "+line));
 			}
 			else {
-				rm.nextState(rm.states.PARAM);
-				var newParam = parser.parse("PARAM "+line);
-				rm.currType().params.push(newParam);
+				state.nextState(state.states.PARAM);
+				state.currModule.addParam(parser.parse("PARAM "+line));
 			}
 			break;
 	}
@@ -137,6 +140,6 @@ function processRmdl(rmdlString){
 	var parser = new marked.Parser(options);
 	parser.tok = tokWrapper;
 	var html = parser.parse(tokens)
-	console.log(rm);
+	console.log(ast.processModel());
 }
 
