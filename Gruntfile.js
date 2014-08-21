@@ -38,7 +38,7 @@ module.exports = function(grunt) {
 		grunt.file.write(files[0].dest, out );
 	}
 	catch(err){
-		grunt.fail.warn("Failed to generate parser code for '"+files[0].src[0]+"':\n\n"+err);
+		grunt.fail.warn("Failed to generate parser code for '"+files[0].src[0]+"':\n\n"+err+"\n");
 	}
   });
   

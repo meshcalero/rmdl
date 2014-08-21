@@ -24,6 +24,6 @@
     "grunt-contrib-concat": "^0.5.0",
     "grunt-contrib-uglify": "^0.5.1",
     "grunt-newer": "^0.7.0",
-    "jison": "^0.4.13"
+    "jison": "0.4.13"
   }
 }

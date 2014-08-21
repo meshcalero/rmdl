@@ -6,7 +6,7 @@ The GIST API provides two resource types:
 * Gists: A collection of hyperlinks to Gist resources
 * Gist: An individual Gist resource
 
-Gists : GistModel
+Gists : GistsModel
 ------
 The resource Gists models a collection of hyperlinks to Gist resources
 

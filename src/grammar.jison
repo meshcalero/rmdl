@@ -72,39 +72,39 @@ LineOptions
 
 ModuleDecl 
 	: IDENTIFIER 							{ $$ = new ast.ModuleDecl( $1 ); }
-	| IDENTIFIER ':' TypeReference 			{ $$ = new ast.ModuleDecl( $1, $3 );  }
-	| IDENTIFIER ':' TypeReference Properties 	{ $$ = new ast.ModuleDecl( $1, $3, $4 ); }
-	| IDENTIFIER Properties 					{ $$ = new ast.ModuleDecl( $1, null, $4 ); }
+	| IDENTIFIER ':' Reference 				{ $$ = new ast.ModuleDecl( $1, $3 );  }
+	| IDENTIFIER ':' Reference Properties 	{ $$ = new ast.ModuleDecl( $1, $3, $4 ); }
+	| IDENTIFIER Properties 				{ $$ = new ast.ModuleDecl( $1, null, $4 ); }
 	;
 
 DependencyDecl
-	: STRING								{ $$ = { uri : $1, properties: {} }; }
-	| STRING Properties						{ $$ = { uri : $1, properties: $2 }; }
+	: STRING								{ $$ = new ast.DependencyDecl( $1 ); }
+	| STRING Properties						{ $$ = new ast.DependencyDecl( $1, $2 ); }
 	;
 
 TypeDecl
 	: IDENTIFIER							{ $$ = new ast.TypeDecl( $1 ); }
-	| IDENTIFIER ':' TypeReference			{ $$ = new ast.TypeDecl( $1, $3 ); }
-	| IDENTIFIER ':' TypeReference Properties	{ $$ = new ast.TypeDecl( $1, $3, $4 ); }
+	| IDENTIFIER ':' Reference				{ $$ = new ast.TypeDecl( $1, $3 ); }
+	| IDENTIFIER ':' Reference Properties	{ $$ = new ast.TypeDecl( $1, $3, $4 ); }
 	| IDENTIFIER Properties					{ $$ = new ast.TypeDecl( $1, null, $2 ); }
 	;
 
 ElementDecl
 	: IDENTIFIER							{ $$ = new ast.ElementDecl( $1 ); }
-	| IDENTIFIER ':' TypeReference			{ $$ = new ast.ElementDecl( $1, $3 ); }
-	| IDENTIFIER ':' TypeReference Properties	{ $$ = new ast.ElementDecl( $1, $3, $4 ); }
-	| ':' TypeReference						{ $$ = new ast.ElementDecl( null, $2 ); }
+	| IDENTIFIER ':' Reference				{ $$ = new ast.ElementDecl( $1, $3 ); }
+	| IDENTIFIER ':' Reference Properties	{ $$ = new ast.ElementDecl( $1, $3, $4 ); }
+	| ':' Reference							{ $$ = new ast.ElementDecl( null, $2 ); }
 	;
 
 ParameterDecl
-	: IDENTIFIER ':' TypeReference			{ $$ = { name : $1, type: $3 }; }
-	| IDENTIFIER ':' TypeReference Properties	{ $$ = { name : $1, type: $3, properties: $4 }; }
+	: IDENTIFIER ':' Reference				{ $$ = { name : $1, type: $3 }; }
+	| IDENTIFIER ':' Reference Properties	{ $$ = { name : $1, type: $3, properties: $4 }; }
 	;
 
-TypeReference
-	: IDENTIFIER 							{ $$= { refType: 'type', name: $1, params: [] }; }
-	| IDENTIFIER '[' ']'					{ $$= { refType: 'type', name: $1, params: [] }; }
-	| IDENTIFIER '[' KeyValueList ']'		{ $$= { refType: 'type', name: $1, params: $3 }; }
+Reference
+	: QualifiedIdentifier 						{ $$ = new ast.Reference( $1 ); }
+	| QualifiedIdentifier '[' ']'				{ $$ = new ast.Reference( $1, [] ); }
+	| QualifiedIdentifier '[' KeyValueList ']'	{ $$ = new ast.Reference( $1, $3 ); }
 	;
 
 Properties
@@ -135,11 +135,9 @@ Value
 	| STRING								{ $$ = { valueType: 'string', value: yytext }; }
 	| Boolean								{ $$ = { valueType: 'boolean', value: $1 }; }
 	| NULL									{ $$ = { valueType: 'null', value: null }; }
-	| QualifiedIdentifier					{ $$ = { valueType: 'identifier', value: $1 }; }
-	| IDENTIFIER '[' ']'					{ $$ = { valueType: 'reference', value: { refType: 'type', name: $1 } }; }
-	| IDENTIFIER '[' KeyValueList ']'		{ $$ = { valueType: 'reference', value: { refType: 'type', name: $1, params: $3 } }; }
+	| Reference								{ $$ = { valueType: 'reference', value: $1 }; }
 	;
-
+	
 Boolean
 	: TRUE									{ $$ = true; }
 	| FALSE									{ $$ = false; }

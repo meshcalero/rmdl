@@ -23,10 +23,6 @@ var download = function(url, dest, cb) {
   });
 };
 
-function orDefault(value,def){
-	return ( value == undefined ? def : value )
-}
-
 // Read the file and print its contents.
 var fs = require('fs');
 var filename = require('path').resolve(process.argv[2]);
@@ -140,6 +136,13 @@ function processRmdl(rmdlString){
 	var parser = new marked.Parser(options);
 	parser.tok = tokWrapper;
 	var html = parser.parse(tokens)
-	console.log(ast.processModel());
+	console.log(
+		JSON.stringify(
+			ast.processModel()
+			,function(key,value){
+				return (key.indexOf('_')==0 ? undefined : value );
+			}
+			,2
+	)	);
 }
 
