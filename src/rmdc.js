@@ -39,7 +39,7 @@ ResourceModelState.prototype.states={
 	DEPENDENCY:2,
 	TYPE:3,
 	PARAM:4,
-	ELEMENT:5
+	EXTENSION:5
 };
 
 ResourceModelState.prototype.validTransitions=[
@@ -53,7 +53,7 @@ ResourceModelState.prototype.validTransitions=[
 
 ResourceModelState.prototype.nextState = function(newState){
 	if(!this.validTransitions[this.state,newState]){
-		throw "Unexpected item";
+		throw new Error( "Unexpected transition from state "+this.state+" to "+newState );
 	}
 	this.state = newState;
 }
@@ -73,11 +73,6 @@ var ast = new Ast(filename);
 
 assert(ast,"Failed to instantiate AST");
 
-fs.readFile(filename, 'utf8', function(err, data) {
-  if (err) throw err;
-  //console.log(data);
-  processRmdl(data);
-});
 
 var marked = require('marked');
 
@@ -101,19 +96,23 @@ rmdlRenderer.heading = function(text,level,raw){
 			)	);
 			break;
 		case 4:
-			state.nextState(state.states.ELEMENT);
-			state.currType.addElement(
-				parser.parse("ELEMENT "+line)
+			state.nextState(state.states.EXTENSION);
+			state.currType.addExtension(
+				parser.parse("EXTENSION "+line)
 			);
 			break;
 		case 5: 
-			if(state.state == state.states.MODULE){
+			if(state.state == state.states.MODULE || state.state == state.states.DEPENDENCY){
 				state.nextState(state.states.DEPENDENCY);
-				state.currModule.addDependency(parser.parse("DEPENDENCY "+line));
+				state.currModule.addDependency(
+					parser.parse("DEPENDENCY "+line)
+				);
 			}
 			else {
 				state.nextState(state.states.PARAM);
-				state.currModule.addParam(parser.parse("PARAM "+line));
+				state.currType.addParam(
+					parser.parse("PARAM "+line)
+				);
 			}
 			break;
 	}
@@ -130,11 +129,21 @@ var tokWrapper = function() {
   return marked.Parser.prototype.tok.call(this);
 }
 
+var content = "";
+for( var i=2; i< process.argv.length; i++) {
+	content += fs.readFileSync(process.argv[i], 'utf8') + "\n"
+};
+//console.log(content);
+processRmdl(content);
+
 function processRmdl(rmdlString){
 	var options = { renderer: rmdlRenderer };
-	var tokens = marked.lexer(rmdlString, options);
+	var lexer = new marked.Lexer(options);
 	var parser = new marked.Parser(options);
 	parser.tok = tokWrapper;
+
+
+	var tokens = lexer.lex(rmdlString);
 	var html = parser.parse(tokens)
 	console.log(
 		JSON.stringify(

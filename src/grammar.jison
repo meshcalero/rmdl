@@ -23,6 +23,8 @@ uri						\((([^:/?#]+):)?(\/\/([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?\)
 \s+						/* skip whitespace */
 {int}{frac}?{exp}?\b	return 'NUMBER';
 \"(?:{escChar}|{unicode}|{strChar})*\"		yytext = yytext.substr(1,yyleng-2); return 'STRING';
+"true"					return 'TRUE'
+"false"					return 'FALSE'
 "("						return '('
 ")"						return ')'
 "{"						return '{'
@@ -31,19 +33,20 @@ uri						\((([^:/?#]+):)?(\/\/([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?\)
 "]"						return ']'
 ","						return ','
 ":"						return ':'
+"."						return "."
 null					return 'NULL'
 MODULE					return 'MODULE'
 DEPENDENCY				return 'DEPENDENCY'
 TYPE					return 'TYPE'
 PARAM					return 'PARAM'
-ELEMENT					return 'ELEMENT'
+EXTENSION				return 'EXTENSION'
 {char}{charDigit}*		return 'IDENTIFIER'
 
 /lex
 
 /* parser section */
 
-%token					MODULE DEPENDENCY TYPE PARAM ELEMENT 
+%token					MODULE DEPENDENCY TYPE PARAM ELEMENT TRUE FALSE
 %token					IDENTIFIER STRING NUMBER ( ) { } [ ] , : NULL
 
 %start					RmdlLine
@@ -66,15 +69,15 @@ LineOptions
 	: MODULE ModuleDecl 					{ $$ = $ModuleDecl; }
 	| DEPENDENCY DependencyDecl				{ $$ = $DependencyDecl; }
 	| TYPE TypeDecl							{ $$ = $TypeDecl; }
-	| ELEMENT ElementDecl					{ $$ = $ElementDecl; }
+	| EXTENSION ExtensionDecl				{ $$ = $ExtensionDecl; }
 	| PARAM ParameterDecl					{ $$ = $ParameterDecl; }
 	;
 
 ModuleDecl 
-	: IDENTIFIER 							{ $$ = new ast.ModuleDecl( $1 ); }
-	| IDENTIFIER ':' Reference 				{ $$ = new ast.ModuleDecl( $1, $3 );  }
-	| IDENTIFIER ':' Reference Properties 	{ $$ = new ast.ModuleDecl( $1, $3, $4 ); }
-	| IDENTIFIER Properties 				{ $$ = new ast.ModuleDecl( $1, null, $4 ); }
+	: IDENTIFIER 							{ $$ = new ast.TypedItemDecl( $1 ); }
+	| IDENTIFIER ':' Reference 				{ $$ = new ast.TypedItemDecl( $1, $3 );  }
+	| IDENTIFIER ':' Reference Properties 	{ $$ = new ast.TypedItemDecl( $1, $3, $4 ); }
+	| IDENTIFIER Properties 				{ $$ = new ast.TypedItemDecl( $1, null, $2 ); }
 	;
 
 DependencyDecl
@@ -83,33 +86,33 @@ DependencyDecl
 	;
 
 TypeDecl
-	: IDENTIFIER							{ $$ = new ast.TypeDecl( $1 ); }
-	| IDENTIFIER ':' Reference				{ $$ = new ast.TypeDecl( $1, $3 ); }
-	| IDENTIFIER ':' Reference Properties	{ $$ = new ast.TypeDecl( $1, $3, $4 ); }
-	| IDENTIFIER Properties					{ $$ = new ast.TypeDecl( $1, null, $2 ); }
+	: IDENTIFIER							{ $$ = new ast.TypedItemDecl( $1 ); }
+	| IDENTIFIER ':' Reference				{ $$ = new ast.TypedItemDecl( $1, $3 ); }
+	| IDENTIFIER ':' Reference Properties	{ $$ = new ast.TypedItemDecl( $1, $3, $4 ); }
+	| IDENTIFIER Properties					{ $$ = new ast.TypedItemDecl( $1, null, $2 ); }
 	;
 
-ElementDecl
-	: IDENTIFIER							{ $$ = new ast.ElementDecl( $1 ); }
-	| IDENTIFIER ':' Reference				{ $$ = new ast.ElementDecl( $1, $3 ); }
-	| IDENTIFIER ':' Reference Properties	{ $$ = new ast.ElementDecl( $1, $3, $4 ); }
-	| ':' Reference							{ $$ = new ast.ElementDecl( null, $2 ); }
+ExtensionDecl
+	: IDENTIFIER							{ $$ = new ast.TypedItemDecl( $1 ); }
+	| IDENTIFIER ':' Reference				{ $$ = new ast.TypedItemDecl( $1, $3 ); }
+	| IDENTIFIER ':' Reference Properties	{ $$ = new ast.TypedItemDecl( $1, $3, $4 ); }
+	| ':' Reference							{ $$ = new ast.TypedItemDecl( null, $2 ); }
 	;
 
 ParameterDecl
-	: IDENTIFIER ':' Reference				{ $$ = { name : $1, type: $3 }; }
-	| IDENTIFIER ':' Reference Properties	{ $$ = { name : $1, type: $3, properties: $4 }; }
+	: IDENTIFIER ':' Reference				{ $$ = new ast.TypedItemDecl( $1, $3 ); }
+	| IDENTIFIER ':' Reference Properties	{ $$ = new ast.TypedItemDecl( $1, $3, $4 ); }
 	;
 
 Reference
 	: QualifiedIdentifier 						{ $$ = new ast.Reference( $1 ); }
-	| QualifiedIdentifier '[' ']'				{ $$ = new ast.Reference( $1, [] ); }
+	| QualifiedIdentifier '[' ']'				{ $$ = new ast.Reference( $1 ); }
 	| QualifiedIdentifier '[' KeyValueList ']'	{ $$ = new ast.Reference( $1, $3 ); }
 	;
 
 Properties
 	: '(' ')'								{ $$ = null; }
-	| '(' KeyValueList ')'					{ $$ = $2; }
+	| '(' KeyValueList ')'					{ $$ = new ast.Properties($2); }
 	;
 
 KeyValueList
@@ -118,7 +121,7 @@ KeyValueList
 	;
 
 KeyValue
-	: Key									{ $$ = { itemType: 'keyValue', key: $1, value: { valueType: 'boolean', value: true } }; }
+	: Key									{ $$ = { itemType: 'reference', key: $1 }; }
 	| Key ':' Value							{ $$ = { itemType: 'keyValue', key: $1, value: $3 }; }
 	;
 
@@ -145,7 +148,7 @@ Boolean
 
 QualifiedIdentifier
 	: IDENTIFIER							{ $$ = $1;  }
-	| QualifiedIdentifier '.' IDENTIFIER		{ $$ = $1 + '.' + $2; }
+	| QualifiedIdentifier '.' IDENTIFIER		{ $$ = $1 + '.' + $3; }
 	;
 
 %%

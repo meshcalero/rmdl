@@ -12,19 +12,20 @@ The resource Gists models a collection of hyperlinks to Gist resources
 
 ##### "#Gist"
 It depends on the resource model for an individual Gist
+##### "#Hyper"
 
 ### GistsModel
 
-#### self : Link[]
+#### self : Hyper.Link[]
 Hyperlinks are "just regular elements" with a type predefined in the HyperRMDL model.
-#### search : Link[accept:GistSearch]
-#### list : Link[]
-#### create : Link[type:Gist,method:POST,type:Gist]
+#### search : Hyper.Link[accept:GistSearch]
+#### list : Hyper.Link[]
+#### create : Hyper.Link[type:Gist,method:POST,type:Gist]
 #### total : Integer[min:0]
 #### items : GistLinkCollection
 
-### GistLinkCollection : PaginateableCollection[type:GistLink]
-### GistLink:Link[type:Gist]
+### GistLinkCollection : Hyper.PaginateableCollection[type:GistLink]
+### GistLink:Hyper.Link[type:Gist]
 #### descriptionTeaser : String
 
 ### GistSearch
@@ -35,13 +36,14 @@ This data model describes the parameters for the search link
 Gist : GistModel
 ------
 The resource Gist models an individual Gist resource
+##### "#Hyper"
 
 ### GistModel (usage:inOut)
-#### self : Link[]
-#### edit : Link[method:PUT]
-#### delete : Link[method:DELETE]
-#### archive : Link[type:none,method:POST]
-#### restore : Link[type:none,method:POST]
+#### self : Hyper.SimpleLink
+#### edit : Hyper.Link[method:PUT]
+#### delete : Hyper.Link[method:DELETE]
+#### archive : Hyper.Link[type:none,method:POST]
+#### restore : Hyper.Link[type:none,method:POST]
 #### id: Integer (readOnly)
 #### status: GistStatus (readOnly)
 #### description: String

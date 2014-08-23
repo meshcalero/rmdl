@@ -251,6 +251,7 @@ Some examples:
 * `[Example]()` - short notation for the above
 * `[Example](http://example.com/rmdf#Example)` - refers to the module `Example` in the external document with URI `http://example.com/rmdf`
 * `[Alias](http://example.com/rmdf#Example)` - refers to the module `Example` in the external document with URI `http://example.com/rmdf`
+
 ### Properties
 
 Available properties are predefined, either globally by RMDL directly or by certain tool chains that operate on RMDL specifications. In order to avoid naming conflicts between various tool chains, property identifiers are namespaced and use a dot-notation `namespace.property`. 

@@ -1,23 +1,24 @@
-Hypertext
+Hyper
 ----
-This package extends the basic RMDL types with additional types for the hypertext control features of RMDL.
+This module extends the basic RMDL types with additional types for the hypertext control features of RMDL.
 
 **This document is [WIP](http://en.wikipedia.org/wiki/Work_in_progress)**
 
 ### HyperTemplate (usage:internal)
 A `HyperTemplate` specifies how to construct a hypertext control for a given link to another resource.
 
-##### uri : UriTemplate (required)
-##### method: HttpMethod (default:GET)
-##### accept: AcceptedResources (default:"#none")  
-##### auth: AuthSchemas
+#### uri : UriTemplate (required)
+#### type : Type (default:null)
+#### method: HttpMethod (default:GET)
+#### accept: AcceptedResources (default:null)  
+#### auth: AuthSchemas
 
-###HyperTextControl
+###Link
 ##### template: HyperTemplate
 
-#### href: URI (required)
+#### href: Uri (required)
 A URI linking to the other API resource
-#### type : URI
+#### type : Uri
 The resource type of the target response
 #### method: HttpMethod (default: GET)
 The HTTP method to be used for that hyperlink
@@ -26,16 +27,16 @@ The resource type(s) specifying the resource parameters. A resource may accept m
 #### auth: AuthSchemas
 The authentication schema(s) supported for the target resource
 
-### HyperLink : URI
+### SimpleLink : Uri
 A simplified representation for a HyperTextControl when a URI is sufficient to describe the full hypertext link.
 
-##### type: URI (default:"#implied")
+##### type: Uri (default:"#implied")
 The resource package the Link is pointing to. If provided the `type` attribute of the hypertext control will be derived from the type provided. If not specified, an application must analyze the specific resource type at runtime.
 
 ##### method: HttpMethod (default:GET)
 The HTTP method used for the hyperlink. If provided the `method` attribute of the hypertext control will only support that method.
 
-##### accept: AcceptStrings (default:"#none")
+##### accept: AcceptedResources (default:"#none")
 The list of resource package URI the target resource is accepting
 
 ### HttpMethod: Enum
@@ -59,3 +60,20 @@ The representation enforces the `SimpleLink` representation, and the service imp
  
 #### auto
 The API implementation analyses whether a given hyperlink fulfills the preconditions for the simplified representation and 
+
+### UriTemplate : String
+
+### Uri : String
+
+### AcceptedResources : Collection[type:type]
+##### type : Type
+
+### AuthSchemas : Collection[type:String]
+
+### PaginateableCollection 
+
+#####type : Type
+
+###items : Collection[type:type]
+###next : SimpleLink
+###prev : SimpleLink

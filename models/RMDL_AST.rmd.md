@@ -67,9 +67,10 @@ Specifies a module and all types specified within that module
 
 ### ParameterValue : Choice (named)
 
-The value passed to a parameter of a type can be either a scalar value, a reference to some other type or a reference to a parameter in the context 
+The value passed to a parameter of a type can be either a scalar value, a enumeration identifier, a reference to some other type or a reference to a parameter in the context 
 
 * value : ScalarValue
+* enum : Identifier
 * typeRef : TypeReference
 * paramRef : Identifier
 

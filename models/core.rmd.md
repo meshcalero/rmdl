@@ -1,4 +1,4 @@
-Core (version:0)
+Core
 -----
 
 The Core module contains the base types used to specify new RMDL models, as well as types used for the predefined RMDL options.
@@ -22,7 +22,7 @@ The Core package also defines the following types used for parameters of RDML ty
 * `CharacterSet`: Specifies restrictions for the characters in a String
 * `DefaultValue`: Used for the specification of default values
 
-### Type
+### Type : Type
 
 The internal type `Type` is the root type of all RMDL types. The type is primary needed as type identifier for type parameters that hold types.
  
@@ -56,10 +56,9 @@ A Choice type that can hold **one of** multiple alternative types. The individua
 ##### named: Boolean (default:false)
 Indicates if the model contains the name of the element that is actually contained in an instance of the type
 
-### Boolean: Enum (final:true)
+### Boolean: Type
 A boolean value
-#### true
-#### false
+
 
 ### Integer: Type
 Any number that doesn't require a fractional component. Two parameters allow to restrict the value range of a specific Integer type instance. If not given no assumption on the possible value range should be made, although specific implementations will come with one. Without knowledge of specific implementation data modelers may assume that ever implementation can at least handle 32 bit integer values. 
