@@ -20,7 +20,7 @@ Clone the rmdl project on your machine and build whatever may be available
 	npm install
 	grunt
 
-Once things (hopefully) got built, you can process RMDL files and see the derived resource model specification (as described in [RMDL Toolchain](./rmdl-toolschain.md).
+Once things (hopefully) got built, you can process RMDL files and see the derived resource model specification (as described in [RMDL Toolchain](doc/rmdl-toolschain.md).
 
 E.g. when you want to see the representation for RMDL's core types, you can call:
 
