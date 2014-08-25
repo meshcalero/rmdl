@@ -17,6 +17,7 @@
   },
   "license": "GPL-3.0+",
   "dependencies": {
+    "json-pointer": "^0.2.1",
     "marked": "^0.3.2"
   },
   "devDependencies": {

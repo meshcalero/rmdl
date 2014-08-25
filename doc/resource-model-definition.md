@@ -258,7 +258,7 @@ Available properties are predefined, either globally by RMDL directly or by cert
 
 Property values can only be scalar types (strings, number, boolean). 
 
-Property identifiers without namespace prefix refer to RMDL properties:
+Property identifiers without namespace prefix refer to RMDL properties, as defined in the [core type Properties](../models/core.rmd.md#properties).
 
 * `default: DefaultValue`
 

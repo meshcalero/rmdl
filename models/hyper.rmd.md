@@ -8,9 +8,9 @@ This module extends the basic RMDL types with additional types for the hypertext
 A `HyperTemplate` specifies how to construct a hypertext control for a given link to another resource.
 
 #### uri : UriTemplate (required)
-#### type : Type (default:null)
+#### type : Type
 #### method: HttpMethod (default:GET)
-#### accept: AcceptedResources (default:null)  
+#### accept: AcceptedResources
 #### auth: AuthSchemas
 
 ###Link
@@ -65,10 +65,10 @@ The API implementation analyses whether a given hyperlink fulfills the precondit
 
 ### Uri : String
 
-### AcceptedResources : Collection[type:type]
+### AcceptedResources : String
 ##### type : Type
 
-### AuthSchemas : Collection[type:String]
+### AuthSchemas : String
 
 ### PaginateableCollection 
 

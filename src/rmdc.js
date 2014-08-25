@@ -23,8 +23,6 @@ var download = function(url, dest, cb) {
   });
 };
 
-// Read the file and print its contents.
-var fs = require('fs');
 var filename = require('path').resolve(process.argv[2]);
 
 ResourceModelState = function(){
@@ -144,14 +142,8 @@ function processRmdl(rmdlString){
 
 
 	var tokens = lexer.lex(rmdlString);
-	var html = parser.parse(tokens)
-	console.log(
-		JSON.stringify(
-			ast.processModel()
-			,function(key,value){
-				return (key.indexOf('_')==0 ? undefined : value );
-			}
-			,2
-	)	);
+	var html = parser.parse(tokens);
+	ast.processModel();
+	console.log( ast.toString() );
 }
 
